@@ -1,4 +1,4 @@
-mport stripe
+import stripe
 from fastapi import FastAPI, HTTPException, Request
 import sqlite3
 
