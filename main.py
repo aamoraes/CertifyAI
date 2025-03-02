@@ -1,27 +1,20 @@
-import stripe
+import psycopg2
 from fastapi import FastAPI, HTTPException, Request
-import sqlite3
+import os
 
 app = FastAPI()
 
 # Configurar a API Key do Stripe
 stripe.api_key = "sk_test_51QwdYZPRsTWI4Hbxqr3p70dPMSIfjhcPHbO5JjGsX9MsPTErAliJGnqySOxRjBvV2EbSOO1LIm1mlJHByo7tu8QT00xSdIbIrG"
 
-# Conectar ao banco de dados local (ou usar PostgreSQL/MySQL)
-conn = sqlite3.connect("tmp/kyc_api.db")
+# Pegar a URL do banco de dados do Render
+DATABASE_URL = os.getenv("postgresql://certifyai_db_user:j5z2zv5I1Z4CIX2Jqdu8faKcNOG7cDlb@dpg-cv1q75pu0jms738na1ag-a/certifyai_db")
+
+# Conectar ao PostgreSQL
+conn = psycopg2.connect(DATABASE_URL)
 cursor = conn.cursor()
 
-@app.get("/credits/")
-async def get_credits(api_key: str):
-    cursor.execute("SELECT credits FROM users WHERE api_key = ?", (api_key,))
-    user = cursor.fetchone()
-    if user:
-        return {"remaining_credits": user[0]}
-    raise HTTPException(status_code=404, detail="Usuário não encontrado")
-
-
-
-# Criar tabela de usuários caso não exista
+# Criar tabela se não existir
 cursor.execute("""
 CREATE TABLE IF NOT EXISTS users (
     api_key TEXT PRIMARY KEY,
@@ -29,6 +22,17 @@ CREATE TABLE IF NOT EXISTS users (
 )
 """)
 conn.commit()
+
+@app.get("/credits/")
+async def get_credits(api_key: str):
+    cursor.execute("SELECT credits FROM users WHERE api_key = %s", (api_key,))
+    user = cursor.fetchone()
+    if user:
+        return {"remaining_credits": user[0]}
+    raise HTTPException(status_code=404, detail="Usuário não encontrado")
+
+
+
 
 # Mapeamento de planos do Stripe para créditos
 PLAN_CREDITS_MAPPING = {
