@@ -1,4 +1,5 @@
 fastapi
 uvicorn
 stripe
-sqlite3
+psycopg2
+os
