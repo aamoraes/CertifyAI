@@ -11,6 +11,16 @@ stripe.api_key = "sk_test_51QwdYZPRsTWI4Hbxqr3p70dPMSIfjhcPHbO5JjGsX9MsPTErAliJG
 conn = sqlite3.connect("kyc_api.db")
 cursor = conn.cursor()
 
+@app.get("/credits/")
+async def get_credits(api_key: str):
+    cursor.execute("SELECT credits FROM users WHERE api_key = ?", (api_key,))
+    user = cursor.fetchone()
+    if user:
+        return {"remaining_credits": user[0]}
+    raise HTTPException(status_code=404, detail="Usuário não encontrado")
+
+
+
 # Criar tabela de usuários caso não exista
 cursor.execute("""
 CREATE TABLE IF NOT EXISTS users (
