@@ -2,4 +2,3 @@ fastapi
 uvicorn
 stripe
 psycopg2
-os
