@@ -8,7 +8,7 @@ app = FastAPI()
 stripe.api_key = "sk_test_51QwdYZPRsTWI4Hbxqr3p70dPMSIfjhcPHbO5JjGsX9MsPTErAliJGnqySOxRjBvV2EbSOO1LIm1mlJHByo7tu8QT00xSdIbIrG"
 
 # Conectar ao banco de dados local (ou usar PostgreSQL/MySQL)
-conn = sqlite3.connect("kyc_api.db")
+conn = sqlite3.connect("tmp/kyc_api.db")
 cursor = conn.cursor()
 
 @app.get("/credits/")
